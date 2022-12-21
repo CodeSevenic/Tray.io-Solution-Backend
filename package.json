@@ -1,0 +1,29 @@
+{
+  "name": "mo-solutions",
+  "version": "0.1.0",
+  "private": true,
+  "main": "server.js",
+  "dependencies": {
+    "apollo-boost": "^0.1.9",
+    "apollo-cache-inmemory": "^1.2.5",
+    "apollo-client": "^2.3.5",
+    "apollo-link": "^1.2.2",
+    "apollo-link-context": "^1.0.8",
+    "apollo-link-error": "^1.1.0",
+    "apollo-link-http": "^1.5.4",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "firebase": "^9.15.0",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.9.2",
+    "lodash": "^4.17.13",
+    "morgan": "^1.9.0",
+    "node-fetch": "^2.1.2",
+    "uuid": "^3.2.1"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  }
+}
