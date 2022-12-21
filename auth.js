@@ -20,6 +20,7 @@ module.exports = function (app) {
    * session.
    */
   app.post('/api/login', function (req, res) {
+    console.log('What do you get? ', req.body);
     const user = attemptLogin(req);
     if (user && (!user.uuid || !user.trayId)) {
       res.status(500).send({
@@ -32,6 +33,7 @@ module.exports = function (app) {
       });
 
       // Attempt to generate the external user token and save to session:
+      console.log("Who's this USer: ", user);
       generateUserAccessToken(req, res, user)
         .then((_) => res.sendStatus(200))
         .catch((err) => {

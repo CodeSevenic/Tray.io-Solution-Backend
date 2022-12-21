@@ -18,7 +18,7 @@ exports.attemptLogin = (req) => {
     req.session.admin = true;
   }
 
-  getUserFromDB();
+  // getUserFromDB();
 
   return user;
 };
