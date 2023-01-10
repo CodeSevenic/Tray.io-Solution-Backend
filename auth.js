@@ -94,11 +94,19 @@ module.exports = function (app) {
     res.sendStatus(200);
   });
 
+  // Remote Register Users from external applications as a webhook
+  // app.post('/api/tray-solutions/register', (req, res) => {
+  //   const { name, email } = req.body;
+  //   console.log('Name: ', name, 'Email: ', email);
+  //   res.sendStatus(200);
+  // });
+
   // Authenticate all endpoints except the auth endpoints defined in this module
   app.use(function (req, res, next) {
     if (req.session && req.session.admin) {
       return next();
     } else {
+      console.log('BAD Stuff');
       return res.sendStatus(401);
     }
   });

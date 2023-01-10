@@ -147,10 +147,4 @@ module.exports = function (app) {
       .then(() => res.sendStatus(200))
       .catch((err) => res.status(500).send({ err }));
   });
-
-  // Remote Register Users from external applications as a webhook
-  app.post('/tray-solutions/register', (req, res) => {
-    const { name, email } = req.body;
-    console.log('Name: ', name, 'Email: ', email);
-  });
 };
