@@ -3,6 +3,7 @@ const { log } = require('./logging');
 const { attemptLogin, generateUserAccessToken } = require('./domain/login');
 
 const { checkUserExists, generateNewUser, validateRequest } = require('./domain/registration');
+const { getUserFromDB } = require('./firebase-db');
 
 module.exports = function (app) {
   app.use(
@@ -75,6 +76,7 @@ module.exports = function (app) {
     generateNewUser(req)
       .then((user) => {
         log({ message: `successfully created user ${req.body.username}`, object: user });
+        getUserFromDB();
         return res.status(200).send(user);
       })
       .catch((err) => {
