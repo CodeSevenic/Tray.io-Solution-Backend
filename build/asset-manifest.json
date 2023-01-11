@@ -1,15 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.e4acc996.chunk.css",
-    "main.js": "/static/js/main.989b6fa0.chunk.js",
-    "main.js.map": "/static/js/main.989b6fa0.chunk.js.map",
+    "main.css": "/static/css/main.150926cb.chunk.css",
+    "main.js": "/static/js/main.881b7021.chunk.js",
+    "main.js.map": "/static/js/main.881b7021.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.d5a21bad.js",
     "runtime-main.js.map": "/static/js/runtime-main.d5a21bad.js.map",
-    "static/js/2.82d9436b.chunk.js": "/static/js/2.82d9436b.chunk.js",
-    "static/js/2.82d9436b.chunk.js.map": "/static/js/2.82d9436b.chunk.js.map",
+    "static/js/2.9617d4f2.chunk.js": "/static/js/2.9617d4f2.chunk.js",
+    "static/js/2.9617d4f2.chunk.js.map": "/static/js/2.9617d4f2.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.efcdf42e958d32c0aedb3791e598e784.js": "/precache-manifest.efcdf42e958d32c0aedb3791e598e784.js",
+    "precache-manifest.2d368bc1554c499b4ad2a7e59a046456.js": "/precache-manifest.2d368bc1554c499b4ad2a7e59a046456.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.e4acc996.chunk.css.map": "/static/css/main.e4acc996.chunk.css.map"
+    "static/css/main.150926cb.chunk.css.map": "/static/css/main.150926cb.chunk.css.map",
+    "static/media/Artboard.png": "/static/media/Artboard.8f342131.png",
+    "static/media/YoboDataLogo.png": "/static/media/YoboDataLogo.4b397aaa.png"
   }
 }
