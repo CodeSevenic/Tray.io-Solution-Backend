@@ -5,7 +5,7 @@ const { get, map, values } = require('lodash');
 function getNodesAt(results, path) {
   return map(values(get(results, path)), (x) => x.node);
 }
-
+const masterToken = process.env.TRAY_MASTER_TOKEN;
 const solutionPath = `${process.env.TRAY_APP_URL}/external/solutions/${process.env.TRAY_PARTNER}`;
 const editAuthPath = `${process.env.TRAY_APP_URL}/external/auth/edit/${process.env.TRAY_PARTNER}`;
 const createAuthPath = `${process.env.TRAY_APP_URL}/external/auth/create/${process.env.TRAY_PARTNER}`;
@@ -146,5 +146,32 @@ module.exports = function (app) {
       .deleteSolutionInstance(req.session.token, req.params.solutionInstanceId)
       .then(() => res.sendStatus(200))
       .catch((err) => res.status(500).send({ err }));
+  });
+
+  // GET users
+  app.get('/api/solutionUsers', (req, res) => {
+    queries
+      .users(masterToken)
+      .then((results) => {
+        res.status(200).send({
+          results,
+        });
+      })
+      .catch((err) => res.status(500).send(err));
+  });
+
+  // Delete user end point
+  app.post('/api/deleteUser/:userId', (req, res) => {
+    {
+      const userId = req.params.userId;
+      mutations
+        .deleteUser(userId, masterToken)
+        .then((results) => {
+          res.status(200).send({
+            results,
+          });
+        })
+        .catch((err) => res.status(500).send(err));
+    }
   });
 };

@@ -9,7 +9,9 @@ const {
   where,
   query,
   addDoc,
-} = require('firebase/firestore/lite');
+  updateDoc,
+} = require('firebase/firestore');
+const { getData } = require('./db');
 
 // =========== CODE TO STORE THE USER ACCESS IN FIREBASE ========== //
 
@@ -24,32 +26,6 @@ const firebaseConfig = {
 
 const appFirebase = initializeApp(firebaseConfig);
 const db = getFirestore(appFirebase);
-
-// // Store refreshToken
-// exports.insertUserToDB = async (token) => {
-//   try {
-//     // Check if user already exists in DB
-//     let isExist = false;
-//     const q = query(collection(db, 'users'), where('token', '==', token));
-//     const querySnapshot = await getDocs(q);
-//     querySnapshot.forEach((doc) => {
-//       if (doc.exists(token)) {
-//         const obj = doc.data();
-//         isExist = true;
-//       }
-//     });
-
-//     if (isExist) {
-//       return;
-//     }
-
-//     await setDoc(doc(db, 'users', 'tokens'), {
-//       token,
-//     });
-//   } catch (e) {
-//     console.log(e);
-//   }
-// };
 
 exports.addUserToBD = async (user) => {
   try {
@@ -74,6 +50,7 @@ exports.getUserFromDB = async () => {
       trayId: doc.get('user.trayId'),
       username: doc.get('user.body.username'),
       password: doc.get('user.body.password'),
+      adm: doc.get('user.body.admin'),
     };
 
     users.push(user);
@@ -83,18 +60,30 @@ exports.getUserFromDB = async () => {
   return users;
 };
 
-// Fetch Refresh Token if exist in FireStore
-// exports.getTokenIfExist = async () => {
-//   let refreshToken;
-//   const docRef = doc(db, 'users', 'tokens');
-//   const docSnap = await getDoc(docRef);
+// Get fresh DB
+const data = this.getUserFromDB();
+getData(data);
 
-//   if (docSnap.exists()) {
-//     const obj = docSnap.data();
-//     refreshToken = obj.token;
-//   } else {
-//     console.log('No such document!');
-//   }
+exports.updateUserValues = async (userId, name, username, password) => {
+  const q = query(collection(db, 'users'), where('user.uuid', '==', userId));
+  const querySnapshot = await getDocs(q);
 
-//   return refreshToken;
-// };
+  let doc_id;
+
+  querySnapshot.forEach((doc) => {
+    doc_id = doc.id;
+  });
+  console.log('Dog ID: ', doc_id);
+
+  const updateUser = doc(db, 'users', `${doc_id}`);
+
+  await updateDoc(updateUser, {
+    'user.body.name': name,
+    'user.body.username': username,
+    'user.body.password': password === '' ? '1234567890' : password,
+  }).then((res) => {
+    // Get recently updated DB
+    const dataUpdated = this.getUserFromDB();
+    getData(dataUpdated);
+  });
+};

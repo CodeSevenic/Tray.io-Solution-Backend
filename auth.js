@@ -1,9 +1,11 @@
 const { log } = require('./logging');
 
-const { attemptLogin, generateUserAccessToken } = require('./domain/login');
+const { attemptLogin, generateUserAccessToken, attemptUpdateUser } = require('./domain/login');
 
 const { checkUserExists, generateNewUser, validateRequest } = require('./domain/registration');
-const { getUserFromDB } = require('./firebase-db');
+const { getUserFromDB, updateUserValues } = require('./firebase-db');
+const { json, response } = require('express');
+const { getData } = require('./db');
 
 module.exports = function (app) {
   app.use(
@@ -20,7 +22,9 @@ module.exports = function (app) {
    * Otherwise attempt to generate a tray access token and set user info onto
    * session.
    */
+
   app.post('/api/login', function (req, res) {
+    // Get fresh DB
     console.log('What do you get? ', req.body);
     const user = attemptLogin(req);
     if (user && (!user.uuid || !user.trayId)) {
@@ -32,11 +36,31 @@ module.exports = function (app) {
         message: 'Logged in with:',
         object: user,
       });
+      // give access to the uuid to frontend
+      const uuid = user.uuid;
+      const name = user.name;
+      const username = user.username;
+      let admin;
+      let changePass;
+      if (user.adm) {
+        admin = user.adm;
+      }
+      if (user.password === '1234567890') {
+        changePass = 'change-pass';
+      }
 
       // Attempt to generate the external user token and save to session:
       console.log("Who's this USer: ", user);
       generateUserAccessToken(req, res, user)
-        .then((_) => res.sendStatus(200))
+        .then((_) =>
+          res.json({
+            userToken: uuid,
+            name: name,
+            username: username,
+            adm: admin,
+            chg: changePass,
+          })
+        )
         .catch((err) => {
           log({ message: 'Failed to generate user access token:', object: err });
           res.status(500).send(err);
@@ -48,6 +72,22 @@ module.exports = function (app) {
           'User not found. Keep in mind OEM Demo app stores new users in-memory and they are lost on server restart.',
       });
     }
+  });
+
+  /**
+   * /api/update-credentials
+   */
+  app.post('/api/update-credentials', async (req, res) => {
+    await updateUserValues(
+      req.body.userId,
+      req.body.name,
+      req.body.username,
+      req.body.password
+    ).then((response) =>
+      res.status(204).send({
+        message: 'User details successfully updated',
+      })
+    );
   });
 
   /*
@@ -76,7 +116,8 @@ module.exports = function (app) {
     generateNewUser(req)
       .then((user) => {
         log({ message: `successfully created user ${req.body.username}`, object: user });
-        getUserFromDB();
+        const data = getUserFromDB();
+        getData(data);
         return res.status(200).send(user);
       })
       .catch((err) => {
@@ -94,20 +135,13 @@ module.exports = function (app) {
     res.sendStatus(200);
   });
 
-  // Remote Register Users from external applications as a webhook
-  // app.post('/api/tray-solutions/register', (req, res) => {
-  //   const { name, email } = req.body;
-  //   console.log('Name: ', name, 'Email: ', email);
-  //   res.sendStatus(200);
-  // });
-
   // Authenticate all endpoints except the auth endpoints defined in this module
-  app.use(function (req, res, next) {
-    if (req.session && req.session.admin) {
-      return next();
-    } else {
-      console.log('BAD Stuff');
-      return res.sendStatus(401);
-    }
-  });
+  // app.use(function (req, res, next) {
+  //   if (req.session && req.session.admin) {
+  //     return next();
+  //   } else {
+  //     console.log('BAD Stuff');
+  //     return res.sendStatus(401);
+  //   }
+  // });
 };

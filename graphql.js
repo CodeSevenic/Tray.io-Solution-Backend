@@ -21,7 +21,7 @@ exports.queries = {
   },
 
   auths: (token) => {
-    const query = gql`
+    const query = gql/*template*/ `
       {
         viewer {
           authentications {
@@ -31,6 +31,31 @@ exports.queries = {
                 name
               }
             }
+          }
+        }
+      }
+    `;
+
+    return generateClient(token).query({ query });
+  },
+  // Get all available users
+  users: (token) => {
+    const query = gql/*template*/ `
+      {
+        users {
+          edges {
+            node {
+              name
+              id
+              externalUserId
+            }
+            cursor
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+            hasPreviousPage
+            startCursor
           }
         }
       }
@@ -193,5 +218,17 @@ exports.mutations = {
         `;
 
     return generateClient(userToken).mutate({ mutation });
+  },
+  // Delete user function
+  deleteUser: (userId, masterToken) => {
+    const mutation = gql/*template*/ `
+            mutation {
+              removeExternalUser(input: {userId: "${userId}"}) {
+                clientMutationId
+              }
+            }
+        `;
+
+    return generateClient(masterToken).mutate({ mutation });
   },
 };

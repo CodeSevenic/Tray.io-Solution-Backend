@@ -1,17 +1,18 @@
-const { getUserFromDB } = require('./firebase-db');
+// const { getUserFromDB } = require('./firebase-db');
 
 // In-memory users instead of a DB:
 let mockUserDB = [];
 
 // Use Real DB store instead of mockDB
-const getData = async () => {
-  const data = await getUserFromDB();
-
-  console.log(data);
-  mockUserDB = data;
+exports.getData = async (data) => {
+  const dbData = await data;
+  // const data = await getUserFromDB();
+  console.log(dbData);
+  mockUserDB = dbData;
 };
 
-getData();
+// this.getData();
+
 /**
  * Retreive user from the Mock DB:
  * @param {User} input - {username: 'myname', password: 'mypass'}
@@ -21,6 +22,16 @@ exports.retrieveUserFromMockDB = (input) => {
   const matches = mockUserDB.filter(
     (user) => user.username === input.username && user.password === input.password
   );
+
+  return matches[0];
+};
+/**
+ * Retreive user by UUID from the Mock DB:
+ * @param {User} input - {uuid: '46ytd-jgf6hg'}
+ * @returns {User | undefined}
+ */
+exports.retrieveUserByUuId = (input) => {
+  const matches = mockUserDB.filter((user) => user.uuid === input.uuid);
 
   return matches[0];
 };
@@ -48,5 +59,6 @@ exports.insertUserToMockDB = (input) => {
     trayId: input.trayId,
     username: input.body.username,
     password: input.body.password,
+    adm: input.body.adm,
   });
 };

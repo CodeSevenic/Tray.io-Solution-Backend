@@ -1,17 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.b48bfd35.chunk.css",
-    "main.js": "/static/js/main.881b7021.chunk.js",
-    "main.js.map": "/static/js/main.881b7021.chunk.js.map",
+    "main.css": "/static/css/main.3475308c.chunk.css",
+    "main.js": "/static/js/main.871976cf.chunk.js",
+    "main.js.map": "/static/js/main.871976cf.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.d5a21bad.js",
     "runtime-main.js.map": "/static/js/runtime-main.d5a21bad.js.map",
-    "static/js/2.9617d4f2.chunk.js": "/static/js/2.9617d4f2.chunk.js",
-    "static/js/2.9617d4f2.chunk.js.map": "/static/js/2.9617d4f2.chunk.js.map",
+    "static/js/2.7967ecfd.chunk.js": "/static/js/2.7967ecfd.chunk.js",
+    "static/js/2.7967ecfd.chunk.js.map": "/static/js/2.7967ecfd.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.0c689730fa5b679d7c35fc9d710dec27.js": "/precache-manifest.0c689730fa5b679d7c35fc9d710dec27.js",
+    "precache-manifest.06fd2f8a93aa03f573c255e201bf80a4.js": "/precache-manifest.06fd2f8a93aa03f573c255e201bf80a4.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.b48bfd35.chunk.css.map": "/static/css/main.b48bfd35.chunk.css.map",
+    "static/css/main.3475308c.chunk.css.map": "/static/css/main.3475308c.chunk.css.map",
     "static/media/Artboard.png": "/static/media/Artboard.8f342131.png",
-    "static/media/YoboDataLogo.png": "/static/media/YoboDataLogo.4b397aaa.png"
+    "static/media/YoboDataLogo.png": "/static/media/YoboDataLogo.4b397aaa.png",
+    "static/media/animated-gif.gif": "/static/media/animated-gif.7c013129.gif"
   }
 }
