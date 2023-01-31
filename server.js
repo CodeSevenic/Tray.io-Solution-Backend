@@ -3,20 +3,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cors = require('cors');
-
-// let bodyParser = require('body-parser');
-
-// Front End
-app.use(express.static(path.join(__dirname, 'build')));
-
-app.get('/', function (_, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'), function (err) {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-});
-
 // support json encoded bodies
 // app.use(bodyParser.json());
 // Body parser, reading data from body into req.body
@@ -45,6 +31,17 @@ require('./auth')(app);
 
 // Setup API router:
 require('./api')(app);
+
+// Front End
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', function (_, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
 
 app.listen(process.env.PORT || 3001, () => {
   console.log(
