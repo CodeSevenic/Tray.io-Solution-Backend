@@ -175,6 +175,7 @@ module.exports = function (app) {
     }
   });
 
+  // Delete auth
   app.post('/api/deleteAuth', (req, res) => {
     const authId = req.body.authId;
     const userToken = req.session.token;
