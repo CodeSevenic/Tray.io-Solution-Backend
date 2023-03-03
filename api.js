@@ -174,4 +174,18 @@ module.exports = function (app) {
         .catch((err) => res.status(500).send(err));
     }
   });
+
+  app.post('/api/deleteAuth', (req, res) => {
+    const authId = req.body.authId;
+    const userToken = req.session.token;
+    mutations
+      .deleteAuth(userToken, authId)
+      .then((response) => response.text())
+      .then((results) => {
+        res.status(200).send({
+          results,
+        });
+      })
+      .catch((error) => console.log('error', error));
+  });
 };

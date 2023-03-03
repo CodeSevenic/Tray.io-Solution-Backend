@@ -1,6 +1,8 @@
 // Module with all graphql queries and mutations:
 
 const gql = require('graphql-tag');
+const fetch = require('node-fetch');
+const { Headers } = fetch;
 
 const { generateClient, masterClient } = require('./gqlclient');
 
@@ -230,5 +232,26 @@ exports.mutations = {
         `;
 
     return generateClient(masterToken).mutate({ mutation });
+  },
+
+  // Delete Auth
+  deleteAuth: (userToken, authId) => {
+    let myHeaders = new Headers();
+    myHeaders.append('Authorization', `Bearer ${userToken}`);
+    myHeaders.append('Content-Type', 'application/json');
+
+    let graphql = JSON.stringify({
+      query:
+        'mutation ($authenticationId: ID!){\n  removeAuthentication(input: { authenticationId: $authenticationId }) {\n    clientMutationId\n  }\n}',
+      variables: { authenticationId: `${authId}` },
+    });
+    let requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: graphql,
+      redirect: 'follow',
+    };
+
+    return fetch('https://tray.io/graphql', requestOptions);
   },
 };
