@@ -15,24 +15,35 @@ const { getData } = require('./db');
 
 // =========== CODE TO STORE THE USER ACCESS IN FIREBASE ========== //
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: 'AIzaSyDo9FWRH0E-944bKboPoiKqEwdyQry3N0c',
-  authDomain: 'tray-solution-db.firebaseapp.com',
-  projectId: 'tray-solution-db',
-  storageBucket: 'tray-solution-db.appspot.com',
-  messagingSenderId: '923279392016',
-  appId: '1:923279392016:web:4943ab72d4e11b3074f995',
+  apiKey: 'AIzaSyCsPFUPevaJJxNR_PHsBoTaeK1BQddgVoU',
+  authDomain: 'yubodata-9137d.firebaseapp.com',
+  projectId: 'yubodata-9137d',
+  storageBucket: 'yubodata-9137d.appspot.com',
+  messagingSenderId: '89046230269',
+  appId: '1:89046230269:web:596a3347e7f368620cca94',
 };
 
 const appFirebase = initializeApp(firebaseConfig);
 const db = getFirestore(appFirebase);
 
+// exports.addUserToBD = async (user) => {
+//   try {
+//     const docRef = await addDoc(collection(db, 'users'), {
+//       user,
+//     });
+//     console.log('Document written with ID: ', docRef.id);
+//   } catch (e) {
+//     console.error('Error adding document: ', e);
+//   }
+// };
+
 exports.addUserToBD = async (user) => {
   try {
-    const docRef = await addDoc(collection(db, 'users'), {
-      user,
-    });
-    console.log('Document written with ID: ', docRef.id);
+    const docRef = doc(db, 'users', user.body.username); // create a reference to a document with ID 'username'
+    await setDoc(docRef, { user }); // write data to the document
+    console.log('Document written with ID: ', user.body.username);
   } catch (e) {
     console.error('Error adding document: ', e);
   }
