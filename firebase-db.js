@@ -12,17 +12,18 @@ const {
   updateDoc,
 } = require('firebase/firestore');
 const { getData } = require('./db');
+require('dotenv').config();
 
 // =========== CODE TO STORE THE USER ACCESS IN FIREBASE ========== //
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: 'AIzaSyCsPFUPevaJJxNR_PHsBoTaeK1BQddgVoU',
-  authDomain: 'yubodata-9137d.firebaseapp.com',
-  projectId: 'yubodata-9137d',
-  storageBucket: 'yubodata-9137d.appspot.com',
-  messagingSenderId: '89046230269',
-  appId: '1:89046230269:web:596a3347e7f368620cca94',
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
 };
 
 const appFirebase = initializeApp(firebaseConfig);
