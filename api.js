@@ -1,3 +1,11 @@
+const { deleteDoc, doc } = require('firebase/firestore');
+const {
+  deleteUserFromDB,
+  deleteNonTrayUsers,
+  getUserFromDB,
+  deleteUserByTrayId,
+  sendPasswordResetEmail,
+} = require('./firebase-db');
 const { mutations, queries } = require('./graphql');
 const { get, map, values } = require('lodash');
 
@@ -83,6 +91,7 @@ module.exports = function (app) {
     const externalUserToken = req.session.token;
 
     if (!externalUserToken) {
+      console.log('Missing external user auth');
       res.status(500).send('Missing external user auth');
     }
 
@@ -113,6 +122,7 @@ module.exports = function (app) {
         });
       })
       .catch((err) => {
+        console.log('error: ', err);
         res.status(500).send(err);
       });
   });
@@ -160,18 +170,33 @@ module.exports = function (app) {
       .catch((err) => res.status(500).send(err));
   });
 
+  const fetchUsers = async () => {
+    const users = await queries.users(masterToken);
+    // console.log('Users', users.data.users.edges);
+    for (let user of users.data.users.edges) {
+      const trayId = user.node.id;
+      const firstName = user.node.name;
+      const externalUserId = user.node.externalUserId;
+
+      console.log('User info', firstName, ' == ', trayId);
+    }
+    // return users;
+  };
+  // fetchUsers();
+  // deleteNonTrayUsers(masterToken);
+
   // Delete user end point
-  app.post('/api/deleteUser/:userId', (req, res) => {
-    {
-      const userId = req.params.userId;
-      mutations
-        .deleteUser(userId, masterToken)
-        .then((results) => {
-          res.status(200).send({
-            results,
-          });
-        })
-        .catch((err) => res.status(500).send(err));
+  app.post('/api/deleteUser/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    try {
+      // Delete user in Tray.io
+      const results = await mutations.deleteUser(userId, masterToken);
+      await deleteUserByTrayId(userId);
+
+      res.status(200).send({ results });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
     }
   });
 
@@ -188,5 +213,12 @@ module.exports = function (app) {
         });
       })
       .catch((error) => console.log('error', error));
+  });
+
+  // User reset password
+  app.post('/api/reset-password', (req, res) => {
+    const { email } = req.body;
+    console.log('Email: ', email);
+    sendPasswordResetEmail(email, res);
   });
 };

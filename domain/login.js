@@ -30,6 +30,7 @@ exports.attemptLogin = (req) => {
 exports.generateUserAccessToken = (req, res, user) =>
   mutations.authorize(user.trayId).then((authorizeResponse) => {
     req.session.token = get(authorizeResponse, 'data.authorize.accessToken');
+    console.log('Token: ', req.session.token);
 
     return authorizeResponse;
   });

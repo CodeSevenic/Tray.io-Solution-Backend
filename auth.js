@@ -1,11 +1,13 @@
 const { log } = require('./logging');
 
 const { attemptLogin, generateUserAccessToken, attemptUpdateUser } = require('./domain/login');
+const { getAuth, signInWithEmailAndPassword } = require('firebase/auth');
 
 const { checkUserExists, generateNewUser, validateRequest } = require('./domain/registration');
-const { getUserFromDB, updateUserValues } = require('./firebase-db');
+const { getUserFromDB, updateUserValues, getUserByDocId } = require('./firebase-db');
 const { json, response } = require('express');
 const { getData } = require('./db');
+const { get } = require('lodash');
 
 module.exports = function (app) {
   app.use(
@@ -23,57 +25,88 @@ module.exports = function (app) {
    * session.
    */
 
-  app.post('/api/login', function (req, res) {
-    // Get fresh DB
-    console.log('What do you get? ', req.body);
-    const user = attemptLogin(req);
-    if (user && (!user.uuid || !user.trayId)) {
-      res.status(500).send({
-        error: `Unable to login. User "${user.username}" found locally is missing one or more of following required fields: uuid, trayId`,
-      });
-    } else if (user) {
-      log({
-        message: 'Logged in with:',
-        object: user,
-      });
-      // give access to the uuid to frontend
-      const uuid = user.uuid;
-      const name = user.name;
-      const username = user.username;
-      let admin;
-      let changePass;
-      if (user.adm) {
-        admin = user.adm;
-      }
-      if (user.password === '1234567890') {
-        changePass = 'change-pass';
-      }
+  app.post('/api/login', async function (req, res) {
+    const email = req.body.email;
+    const password = req.body.password;
+    // refresh DB
+    getUserFromDB();
+    try {
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // console.log('User: ', userCredential.user);
+      const userObj = await getUserByDocId(userCredential.user.uid);
 
-      // Attempt to generate the external user token and save to session:
-      console.log("Who's this USer: ", user);
-      generateUserAccessToken(req, res, user)
-        .then((_) =>
-          res.json({
-            userToken: uuid,
-            name: name,
-            username: username,
-            adm: admin,
-            chg: changePass,
-          })
-        )
-        .catch((err) => {
-          log({ message: 'Failed to generate user access token:', object: err });
-          res.status(500).send(err);
+      const user = {
+        uuid: userObj.user.uuid,
+        trayId: userObj.user.trayId,
+        name: userObj.user.body.name,
+        username: userObj.user.body.username,
+        adm: userObj.user.body.admin,
+      };
+
+      console.log('User: ', user);
+
+      console.log('User: ', user.uuid + ' and ' + user.trayId);
+
+      // Get fresh DB
+      // console.log('What do you get? ', req.body);
+      // const oldUser = attemptLogin(req);
+      // console.log('Old User: ', oldUser);
+
+      if (!user.trayId) {
+        res.status(500).send({
+          error: `Unable to login. User "${user.username}" found locally is missing one or more of following required fields: uuid, trayId`,
         });
-    } else {
+      } else if (user) {
+        req.session.user = user;
+        log({
+          message: 'Logged in with:',
+          object: user,
+        });
+        // give access to the uuid to frontend
+        const uuid = user.uuid;
+        const name = user.name;
+        const username = user.username;
+        let admin;
+        let changePass;
+        if (user.adm) {
+          admin = user.adm;
+        }
+        // if (user.password === '1234567890') {
+        //   changePass = 'change-pass';
+        // }
+
+        // Attempt to generate the external user token and save to session:
+        console.log("Who's this USer: ", user);
+        generateUserAccessToken(req, res, user)
+          .then((_) =>
+            res.json({
+              userToken: uuid,
+              name: name,
+              username: username,
+              adm: admin,
+              chg: changePass,
+            })
+          )
+          .catch((err) => {
+            log({ message: 'Failed to generate user access token:', object: err });
+            res.status(500).send(err);
+          });
+      } else {
+        log({ message: 'Login failed for user:', object: req.body });
+        res.status(401).send({
+          error:
+            'User not found. Keep in mind OEM Demo app stores new users in-memory and they are lost on server restart.',
+        });
+      }
+    } catch (error) {
+      console.log(error);
       log({ message: 'Login failed for user:', object: req.body });
       res.status(401).send({
-        error:
-          'User not found. Keep in mind OEM Demo app stores new users in-memory and they are lost on server restart.',
+        error: 'Login Error please try again with correct credentials.',
       });
     }
   });
-
   /**
    * /api/update-credentials
    */

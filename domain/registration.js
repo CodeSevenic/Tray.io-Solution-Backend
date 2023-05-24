@@ -5,7 +5,7 @@ const uuidv1 = require('uuid/v1');
 const { isNil } = require('lodash');
 const { mutations } = require('../graphql');
 const { insertUserToMockDB, retrieveUserFromMockDB, userExistsInMockDB } = require('../db');
-const { addUserToBD, getUserFromDB } = require('../firebase-db');
+const { addUserToBD, getUserFromDB, createUserOnFirebase } = require('../firebase-db');
 
 /**
  * Validate user object:
@@ -62,13 +62,24 @@ exports.generateNewUser = (req) => {
   // Generate a tray user for this account:
   return mutations.createExternalUser(uuid, req.body.name).then((createRes) => {
     // Add user to internal DB:
-    insertUserToMockDB({
-      uuid: uuid,
-      body: req.body,
-      trayId: createRes.data.createExternalUser.userId,
-    });
+    // insertUserToMockDB({
+    //   uuid: uuid,
+    //   body: req.body,
+    //   trayId: createRes.data.createExternalUser.userId,
+    // });
 
-    addUserToBD({ uuid: uuid, body: req.body, trayId: createRes.data.createExternalUser.userId });
+    // addUserToBD({ uuid: uuid, body: req.body, trayId: createRes.data.createExternalUser.userId });
+
+    createUserOnFirebase(
+      req.body.name,
+      req.body.username,
+      req.body.email,
+      req.body.password,
+      req.body.admin,
+      createRes.data.createExternalUser.userId,
+      uuid
+    );
+
     getUserFromDB();
 
     return retrieveUserFromMockDB(req.body);

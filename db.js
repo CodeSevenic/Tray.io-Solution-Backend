@@ -7,7 +7,7 @@ let mockUserDB = [];
 exports.getData = async (data) => {
   const dbData = await data;
   // const data = await getUserFromDB();
-  console.log(dbData);
+  // console.log(dbData);
   mockUserDB = dbData;
 };
 
