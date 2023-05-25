@@ -215,7 +215,7 @@ module.exports = function (app) {
       .catch((error) => console.log('error', error));
   });
 
-  // User reset password
+  // User reset password endpoint
   app.post('/api/reset-password', (req, res) => {
     const { email } = req.body;
     console.log('Email: ', email);
