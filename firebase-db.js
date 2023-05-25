@@ -16,11 +16,29 @@ const {
   getAuth,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  deleteUser,
 } = require('firebase/auth');
+
+const admin = require('firebase-admin');
+
 const { getData } = require('./db');
 const { queries } = require('./graphql');
 require('dotenv').config();
 
+admin.initializeApp({
+  credential: admin.credential.cert({
+    type: process.env.ADMIN_TYPE,
+    projectId: process.env.ADMIN_PROJECT_ID,
+    privateKeyId: process.env.ADMIN_PRIVATE_KEY_ID,
+    privateKey: process.env.ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    clientEmail: process.env.ADMIN_CLIENT_EMAIL,
+    clientId: process.env.ADMIN_CLIENT_ID,
+    authUri: process.env.ADMIN_AUTH_URI,
+    tokenUri: process.env.ADMIN_TOKEN_URI,
+    authProviderX509CertUrl: process.env.ADMIN_AUTH_PROVIDER_X509_CERT_URL,
+    clientC509CertUrl: process.env.ADMIN_CLIENT_X509_CERT_URL,
+  }),
+});
 // =========== CODE TO STORE THE USER ACCESS IN FIREBASE ========== //
 
 // Your web app's Firebase configuration
@@ -36,17 +54,6 @@ const firebaseConfig = {
 const appFirebase = initializeApp(firebaseConfig);
 const db = getFirestore(appFirebase);
 const auth = getAuth();
-
-// exports.addUserToBD = async (user) => {
-//   try {
-//     const docRef = await addDoc(collection(db, 'users'), {
-//       user,
-//     });
-//     console.log('Document written with ID: ', docRef.id);
-//   } catch (e) {
-//     console.error('Error adding document: ', e);
-//   }
-// };
 
 exports.addUserToBD = async (user) => {
   try {
@@ -155,9 +162,15 @@ exports.deleteUserByTrayId = async (trayId) => {
   const firebaseUser = firebaseUsers.find((user) => user.trayId === trayId);
 
   // If the user exists in Firebase, remove it
-  if (firebaseUser) {
-    console.log('firebaseUser', firebaseUser.docId);
-    const response = await deleteDoc(doc(db, 'users', firebaseUser.docId));
+  if (firebaseUser.docId) {
+    console.log('firebaseUser Doc ID', firebaseUser.docId);
+
+    // Delete the Firestore document
+    await deleteDoc(doc(db, 'users', firebaseUser.docId));
+
+    // Delete the Firebase Auth user
+    await admin.auth().deleteUser(firebaseUser.docId);
+    // await deleteUser(auth, firebaseUser.docId);
   } else {
     console.log('User not found');
   }
@@ -204,7 +217,7 @@ exports.getUserByDocId = async (docId) => {
   }
 };
 
-// Register all users on Firebase
+// Util function to Register all users on Firebase
 exports.registerAllUsers = async () => {
   // Get the list of users from the database
   const users = await exports.getUserFromDB();
@@ -239,6 +252,7 @@ exports.registerAllUsers = async () => {
     }
   }
 };
+
 // Handle password reset
 exports.sendPasswordResetEmail = (email, res) => {
   sendPasswordResetEmail(auth, email)
