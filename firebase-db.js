@@ -264,6 +264,61 @@ exports.sendPasswordResetEmail = (email, res) => {
     });
 };
 
+// Handle user info update
+/*
+exports.updateUserOnFirebase = async (
+  uid,
+  name,
+  username,
+  email,
+  password,
+  adminStatus = false,
+  trayId,
+  uuid
+) => {
+  console.log(
+    'Updating user on Firebase: ',
+    uid,
+    name,
+    username,
+    email,
+    password,
+    adminStatus,
+    trayId,
+    uuid
+  );
+
+  try {
+    // Update authentication info
+    await admin.auth().updateUser(uid, {
+      email: email,
+      password: password,
+      displayName: name,
+    });
+
+    console.log('User Profile and Password Updated');
+
+    // Also update the Firestore document for the user
+    const userDoc = admin.firestore().doc(`users/${uid}`);
+
+    await userDoc.update({
+      'user.body': {
+        name: name,
+        username: username,
+        admin: adminStatus,
+      },
+      trayId: trayId,
+      uuid: uuid,
+    });
+
+    console.log('Firestore document updated');
+  } catch (error) {
+    console.log('Error: ', error.message);
+  }
+};
+
+*/
+
 // exports.deleteUsersWithPassword = async () => {
 //   // Get the list of users from the database
 //   const users = await exports.getUserFromDB();
