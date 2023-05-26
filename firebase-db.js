@@ -265,59 +265,34 @@ exports.sendPasswordResetEmail = (email, res) => {
 };
 
 // Handle user info update
-/*
-exports.updateUserOnFirebase = async (
-  uid,
-  name,
-  username,
-  email,
-  password,
-  adminStatus = false,
-  trayId,
-  uuid
-) => {
-  console.log(
-    'Updating user on Firebase: ',
-    uid,
-    name,
-    username,
-    email,
-    password,
-    adminStatus,
-    trayId,
-    uuid
-  );
-
+exports.updateUserOnFirebase = async (uid, name, username, password) => {
   try {
+    let authUpdate = {};
+    if (password) authUpdate.password = password;
+
     // Update authentication info
-    await admin.auth().updateUser(uid, {
-      email: email,
-      password: password,
-      displayName: name,
-    });
-
-    console.log('User Profile and Password Updated');
-
+    if (Object.keys(authUpdate).length !== 0) {
+      await admin.auth().updateUser(uid, authUpdate);
+      console.log('User Profile and Password Updated');
+    }
     // Also update the Firestore document for the user
     const userDoc = admin.firestore().doc(`users/${uid}`);
 
-    await userDoc.update({
-      'user.body': {
-        name: name,
-        username: username,
-        admin: adminStatus,
-      },
-      trayId: trayId,
-      uuid: uuid,
-    });
+    let firestoreUpdate = {};
+    if (name) firestoreUpdate['user.body.name'] = name;
+    if (username) firestoreUpdate['user.body.username'] = username;
 
-    console.log('Firestore document updated');
+    if (Object.keys(firestoreUpdate).length !== 0) {
+      await userDoc.update(firestoreUpdate);
+      console.log('Firestore document updated');
+    }
+
+    return true;
   } catch (error) {
     console.log('Error: ', error.message);
+    return false;
   }
 };
-
-*/
 
 // exports.deleteUsersWithPassword = async () => {
 //   // Get the list of users from the database
